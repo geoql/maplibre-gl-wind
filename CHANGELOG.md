@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/geoql/maplibre-gl-wind/compare/v0.1.1...v0.2.0) (2026-01-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Complete rewrite using deck.gl instead of wind-gl-core
+
+### Features
+
+* replace wind-gl-core with deck.gl WindParticleLayer ([4acdf39](https://github.com/geoql/maplibre-gl-wind/commit/4acdf39a3aa49712863150886b7872e1bc5b8d19))
+
 ## [0.1.1](https://github.com/geoql/maplibre-gl-wind/compare/v0.1.0...v0.1.1) (2026-01-15)
 
 
