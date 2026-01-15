@@ -274,11 +274,6 @@ export default class Layer {
     this.map = m;
     const canvas = m.getCanvas();
 
-    console.log('[WindLayer] onAdd called');
-    console.log('[WindLayer] source:', this.source);
-    console.log('[WindLayer] source.type:', this.source?.type);
-    console.log('[WindLayer] options:', this.options);
-
     this.renderer = new Renderer(gl, {
       autoClear: false,
       extensions: [
@@ -297,7 +292,6 @@ export default class Layer {
     );
     this.planeCamera = new OrthographicCamera(0, 1, 1, 0, 0, 1);
 
-    console.log('[WindLayer] Creating BaseLayer...');
     this.layer = new BaseLayer(
       this.source,
       {
@@ -347,15 +341,6 @@ export default class Layer {
             ).privateType;
           }
 
-          console.log(
-            '[WindLayer] getViewTiles sourceType:',
-            sourceType,
-            'LayerSourceType.image:',
-            LayerSourceType.image,
-            'match:',
-            sourceType === LayerSourceType.image,
-          );
-
           if (!this.map) return [];
           const wrapTiles: TileID[] = [];
 
@@ -363,18 +348,10 @@ export default class Layer {
             const coords = (
               source as SourceType & { coordinates: [number, number][] }
             ).coordinates;
-            console.log('[WindLayer] ImageSource coords:', coords);
             const cornerCoords = coords.map((c: [number, number]) =>
               maplibregl.MercatorCoordinate.fromLngLat(c),
             );
-            console.log('[WindLayer] ImageSource cornerCoords:', cornerCoords);
             const tileID = getCoordinatesCenterTileID(cornerCoords);
-            console.log(
-              '[WindLayer] ImageSource tileID:',
-              tileID,
-              'extent:',
-              tileID.extent,
-            );
 
             const { x, y, z } = tileID;
             const wrap = 0;
@@ -415,7 +392,6 @@ export default class Layer {
                 );
               });
             }
-            console.log('[WindLayer] ImageSource wrapTiles:', wrapTiles.length);
           } else if (sourceType === LayerSourceType.tile) {
             const sourceTileSize = source.tileSize;
             const tileSize =
@@ -523,30 +499,8 @@ export default class Layer {
       },
     );
 
-    console.log('[WindLayer] BaseLayer created:', this.layer);
-
     // Initialize the layer - this triggers source loading
     this.layer.initialize();
-    console.log('[WindLayer] BaseLayer initialized');
-
-    setTimeout(() => {
-      console.log('[WindLayer] renderer.width:', this.renderer?.width);
-      console.log('[WindLayer] renderer.height:', this.renderer?.height);
-      console.log(
-        '[WindLayer] canvas size:',
-        this.map?.getCanvas()?.width,
-        this.map?.getCanvas()?.height,
-      );
-      console.log(
-        '[WindLayer] gl.viewport:',
-        this.gl?.getParameter(this.gl?.VIEWPORT),
-      );
-      console.log('[WindLayer] scene.localMatrix:', this.scene?.localMatrix);
-      console.log(
-        '[WindLayer] camera.projectionMatrix:',
-        this.camera?.projectionMatrix,
-      );
-    }, 3000);
 
     this.map.on('movestart', this.moveStart);
     this.map.on('move', this.update);
@@ -556,7 +510,6 @@ export default class Layer {
     this.map.on('resize', this.handleResize);
     this.handleResize();
     this.update();
-    console.log('[WindLayer] onAdd complete');
   }
 
   calcWrappedWorlds() {
@@ -632,12 +585,7 @@ export default class Layer {
   }
 
   async picker(coordinates: maplibregl.LngLatLike) {
-    if (!this.options.picking) {
-      console.warn('[Layer]: please enable picking options!');
-      return null;
-    }
-    if (!this.layer || !coordinates || !this.map) {
-      console.warn('[Layer]: layer not initialized!');
+    if (!this.options.picking || !this.layer || !coordinates || !this.map) {
       return null;
     }
     const point = this.map.project(coordinates);
@@ -678,8 +626,10 @@ export default class Layer {
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.STENCIL_TEST);
 
+    // Reset renderer state to avoid conflicts with MapLibre
     if (this.renderer) {
-      (this.renderer as any).state = {};
+      (this.renderer as unknown as { state: Record<string, unknown> }).state =
+        {};
     }
 
     this.scene.worldMatrixNeedsUpdate = true;
@@ -687,60 +637,11 @@ export default class Layer {
     this.camera.updateMatrixWorld();
     const worlds = this.calcWrappedWorlds();
 
-    if (!this._lastRenderLog || Date.now() - this._lastRenderLog > 2000) {
-      console.log('[WindLayer] render - layer:', !!this.layer);
-      const sourceCache = (this.layer as any)?.source?.sourceCache;
-      if (sourceCache) {
-        console.log(
-          '[WindLayer] render - sourceCache.loaded():',
-          sourceCache.loaded?.(),
-        );
-        const visibleTiles = sourceCache.getVisibleCoordinates?.();
-        console.log(
-          '[WindLayer] render - visible tiles:',
-          visibleTiles?.length,
-        );
-        const cacheTiles = (sourceCache as any)?.cacheTiles;
-        if (cacheTiles) {
-          const firstTileKey = Object.keys(cacheTiles)[0];
-          if (firstTileKey) {
-            const tile = cacheTiles[firstTileKey];
-            console.log(`[WindLayer] tile ${firstTileKey}:`, {
-              state: tile?.state,
-              hasData: tile?.hasData?.(),
-              texturesSize: tile?.textures?.size,
-            });
-          }
-        }
-      }
-      const renderPipeline = (this.layer as any)?.renderPipeline;
-      if (renderPipeline) {
-        console.log(
-          '[WindLayer] render - pipeline passes:',
-          renderPipeline.passes?.length,
-        );
-      }
-      const glError = gl.getError();
-      if (glError !== gl.NO_ERROR) {
-        console.error('[WindLayer] WebGL error before render:', glError);
-      }
-      this._lastRenderLog = Date.now();
-    }
-
     this.layer?.render({
       worlds,
       camera: this.camera,
       planeCamera: this.planeCamera,
     });
-
-    const glError = gl.getError();
-    if (
-      glError !== gl.NO_ERROR &&
-      (!this._lastErrorLog || Date.now() - this._lastErrorLog > 2000)
-    ) {
-      console.error('[WindLayer] WebGL error after render:', glError);
-      this._lastErrorLog = Date.now();
-    }
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, currentFramebuffer);
     gl.bindVertexArray(currentVAO);
@@ -759,7 +660,4 @@ export default class Layer {
     if (scissorTestEnabled) gl.enable(gl.SCISSOR_TEST);
     else gl.disable(gl.SCISSOR_TEST);
   }
-
-  private _lastRenderLog?: number;
-  private _lastErrorLog?: number;
 }

@@ -120,6 +120,11 @@ void main() {
 }
 `;
 
+interface ShaderProgram {
+  program: WebGLProgram;
+  [key: string]: WebGLUniformLocation | number | WebGLProgram | null;
+}
+
 function createShader(
   gl: WebGL2RenderingContext,
   type: number,
@@ -130,7 +135,6 @@ function createShader(
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -141,7 +145,7 @@ function createProgram(
   gl: WebGL2RenderingContext,
   vertSource: string,
   fragSource: string,
-) {
+): ShaderProgram | null {
   const vert = createShader(gl, gl.VERTEX_SHADER, vertSource);
   const frag = createShader(gl, gl.FRAGMENT_SHADER, fragSource);
   if (!vert || !frag) return null;
@@ -154,11 +158,10 @@ function createProgram(
   gl.linkProgram(program);
 
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('Program link error:', gl.getProgramInfoLog(program));
     return null;
   }
 
-  const wrapper: any = { program };
+  const wrapper: ShaderProgram = { program };
   const numAttributes = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
   for (let i = 0; i < numAttributes; i++) {
     const attr = gl.getActiveAttrib(program, i);
@@ -294,7 +297,7 @@ const defaultColors: Record<number, string> = {
 
 export class SimpleWindLayer implements maplibregl.CustomLayerInterface {
   id: string;
-  type: 'custom' = 'custom';
+  type = 'custom' as const;
   renderingMode: '2d' | '3d' = '2d';
 
   private gl: WebGL2RenderingContext | null = null;
@@ -302,8 +305,8 @@ export class SimpleWindLayer implements maplibregl.CustomLayerInterface {
   private windData: WindData | null = null;
   private options: Required<SimpleWindLayerOptions>;
 
-  private drawProgram: any = null;
-  private updateProgram: any = null;
+  private drawProgram: ShaderProgram | null = null;
+  private updateProgram: ShaderProgram | null = null;
 
   private quadBuffer: WebGLBuffer | null = null;
   private particleIndexBuffer: WebGLBuffer | null = null;
@@ -344,11 +347,8 @@ export class SimpleWindLayer implements maplibregl.CustomLayerInterface {
     this.updateProgram = createProgram(this.gl, quadVert, updateFrag);
 
     if (!this.drawProgram || !this.updateProgram) {
-      console.error('[SimpleWindLayer] Failed to create shaders');
       return;
     }
-
-    console.log('[SimpleWindLayer] Shaders created successfully');
 
     this.quadBuffer = createBuffer(
       this.gl,
@@ -433,21 +433,36 @@ export class SimpleWindLayer implements maplibregl.CustomLayerInterface {
 
   private drawParticles(matrix: Float32Array) {
     const gl = this.gl!;
-    const program = this.drawProgram;
+    const program = this.drawProgram!;
     gl.useProgram(program.program);
 
-    bindAttribute(gl, this.particleIndexBuffer, program.a_index, 1);
+    bindAttribute(gl, this.particleIndexBuffer, program.a_index as number, 1);
     bindTexture(gl, this.colorRampTexture, 2);
 
-    gl.uniform1i(program.u_wind, 0);
-    gl.uniform1i(program.u_particles, 1);
-    gl.uniform1i(program.u_color_ramp, 2);
+    gl.uniform1i(program.u_wind as WebGLUniformLocation, 0);
+    gl.uniform1i(program.u_particles as WebGLUniformLocation, 1);
+    gl.uniform1i(program.u_color_ramp as WebGLUniformLocation, 2);
 
-    gl.uniform1f(program.u_particles_res, this.particleStateResolution);
-    gl.uniform2f(program.u_wind_min, this.windData!.uMin, this.windData!.vMin);
-    gl.uniform2f(program.u_wind_max, this.windData!.uMax, this.windData!.vMax);
+    gl.uniform1f(
+      program.u_particles_res as WebGLUniformLocation,
+      this.particleStateResolution,
+    );
+    gl.uniform2f(
+      program.u_wind_min as WebGLUniformLocation,
+      this.windData!.uMin,
+      this.windData!.vMin,
+    );
+    gl.uniform2f(
+      program.u_wind_max as WebGLUniformLocation,
+      this.windData!.uMax,
+      this.windData!.vMax,
+    );
 
-    gl.uniformMatrix4fv(program.u_matrix, false, matrix);
+    gl.uniformMatrix4fv(
+      program.u_matrix as WebGLUniformLocation,
+      false,
+      matrix,
+    );
 
     gl.drawArrays(gl.POINTS, 0, this._numParticles);
   }
@@ -466,25 +481,42 @@ export class SimpleWindLayer implements maplibregl.CustomLayerInterface {
       this.particleStateResolution,
     );
 
-    const program = this.updateProgram;
+    const program = this.updateProgram!;
     gl.useProgram(program.program);
 
-    bindAttribute(gl, this.quadBuffer, program.a_pos, 2);
+    bindAttribute(gl, this.quadBuffer, program.a_pos as number, 2);
 
-    gl.uniform1i(program.u_wind, 0);
-    gl.uniform1i(program.u_particles, 1);
+    gl.uniform1i(program.u_wind as WebGLUniformLocation, 0);
+    gl.uniform1i(program.u_particles as WebGLUniformLocation, 1);
 
-    gl.uniform1f(program.u_rand_seed, Math.random());
+    gl.uniform1f(program.u_rand_seed as WebGLUniformLocation, Math.random());
     gl.uniform2f(
-      program.u_wind_res,
+      program.u_wind_res as WebGLUniformLocation,
       this.windData!.width,
       this.windData!.height,
     );
-    gl.uniform2f(program.u_wind_min, this.windData!.uMin, this.windData!.vMin);
-    gl.uniform2f(program.u_wind_max, this.windData!.uMax, this.windData!.vMax);
-    gl.uniform1f(program.u_speed_factor, this.options.speedFactor);
-    gl.uniform1f(program.u_drop_rate, this.options.dropRate);
-    gl.uniform1f(program.u_drop_rate_bump, this.options.dropRateBump);
+    gl.uniform2f(
+      program.u_wind_min as WebGLUniformLocation,
+      this.windData!.uMin,
+      this.windData!.vMin,
+    );
+    gl.uniform2f(
+      program.u_wind_max as WebGLUniformLocation,
+      this.windData!.uMax,
+      this.windData!.vMax,
+    );
+    gl.uniform1f(
+      program.u_speed_factor as WebGLUniformLocation,
+      this.options.speedFactor,
+    );
+    gl.uniform1f(
+      program.u_drop_rate as WebGLUniformLocation,
+      this.options.dropRate,
+    );
+    gl.uniform1f(
+      program.u_drop_rate_bump as WebGLUniformLocation,
+      this.options.dropRateBump,
+    );
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
