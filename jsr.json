@@ -1,8 +1,12 @@
 {
   "name": "@geoql/maplibre-gl-wind",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "exports": "./dist/index.mjs",
   "publish": {
-    "include": ["dist", "README.md", "LICENSE"]
+    "include": [
+      "dist",
+      "README.md",
+      "LICENSE"
+    ]
   }
 }

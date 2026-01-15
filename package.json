@@ -1,7 +1,7 @@
 {
   "name": "maplibre-gl-wind",
   "description": "Wind visualization layer for MapLibre GL JS with v5 compatibility",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
