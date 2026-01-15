@@ -1,6 +1,6 @@
 {
   "name": "maplibre-gl-wind",
-  "description": "Wind visualization layer for MapLibre GL JS with v5 compatibility",
+  "description": "Wind particle visualization layer for deck.gl and MapLibre GL JS",
   "version": "0.1.1",
   "type": "module",
   "main": "./dist/index.mjs",
@@ -29,29 +29,32 @@
     "publish:npm": "npm publish --access public",
     "publish:jsr": "bunx jsr publish"
   },
-  "dependencies": {
-    "@mapbox/geojson-rewind": "^0.5.2",
-    "@sakitam-gis/rbush": "^3.1.2",
-    "@sakitam-gis/vis-engine": "^1.5.3",
-    "wind-gl-core": "^2.0.2"
+  "peerDependencies": {
+    "@deck.gl/core": ">=9.0.0",
+    "@deck.gl/layers": ">=9.0.0",
+    "@luma.gl/core": ">=9.0.0",
+    "@luma.gl/engine": ">=9.0.0",
+    "@luma.gl/shadertools": ">=9.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",
     "@commitlint/config-conventional": "^20.3.1",
+    "@deck.gl/core": "^9.1.16",
+    "@deck.gl/layers": "^9.1.16",
+    "@luma.gl/core": "^9.2.0",
+    "@luma.gl/engine": "^9.2.0",
+    "@luma.gl/shadertools": "^9.2.0",
     "@types/node": "^25.0.6",
     "husky": "^9.1.7",
     "is-ci": "^4.1.0",
     "lint-staged": "^16.2.7",
-    "maplibre-gl": "5.16.0",
     "oxlint": "^1.39.0",
     "prettier": "^3.7.4",
     "tsdown": "^0.19.0",
     "typescript": "^5.9.3"
   },
-  "peerDependencies": {
-    "maplibre-gl": ">=4.0.0"
-  },
   "keywords": [
+    "deck.gl",
     "maplibre",
     "wind",
     "visualization",
