@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+*.log
+bun.lock
+.git
+
+# Release-please managed files
+CHANGELOG.md
+jsr.json
