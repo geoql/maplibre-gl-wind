@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/geoql/maplibre-gl-wind/compare/v0.2.0...v0.2.1) (2026-02-07)
+
+
+### Miscellaneous
+
+* update commit-msg husky hook ([8d5ee45](https://github.com/geoql/maplibre-gl-wind/commit/8d5ee459d6cc017027f15be10b614add2e3e0fb2))
+
 ## [0.2.0](https://github.com/geoql/maplibre-gl-wind/compare/v0.1.1...v0.2.0) (2026-01-15)
 
 
