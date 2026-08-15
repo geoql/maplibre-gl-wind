@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Release Please
         id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.RELEASE_PAT }}
           config-file: release-please-config.json
@@ -39,29 +39,46 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.release-please.outputs.tag_name || github.event.inputs.tag }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.0.10
         with:
-          node-version: 'lts/*'
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: bun run build
+        run: pnpm run build
 
-      - name: Publish to npm (OIDC)
-        run: npm publish --provenance --access public
+      - name: Resolve version
+        id: version
+        run: |
+          VERSION="${{ needs.release-please.outputs.version || github.event.inputs.tag }}"
+          echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Publish to JSR (OIDC)
-        run: bunx jsr publish --allow-dirty --allow-slow-types
+      - name: Publish to npm with provenance
+        run: |
+          if npm view maplibre-gl-wind@${{ steps.version.outputs.version }} version >/dev/null 2>&1; then
+            echo "maplibre-gl-wind@${{ steps.version.outputs.version }} already published, skipping"
+          else
+            npm publish --provenance --access public --ignore-scripts
+          fi
+
+      - name: Publish to JSR
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if curl -fsS "https://jsr.io/@geoql/maplibre-gl-wind/meta.json" | grep -q "\"$VERSION\""; then
+            echo "@geoql/maplibre-gl-wind@$VERSION already on JSR, skipping"
+          else
+            pnpm dlx jsr publish --allow-dirty --allow-slow-types
+          fi

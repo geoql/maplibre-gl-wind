@@ -1,0 +1,14 @@
+packages: []
+
+overrides:
+  # Keep `vite` (peer/type-only in this workspace) on the same instance as Vite+
+  # so there is never a split Vite copy.
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.9
+
+peerDependencyRules:
+  allowedVersions:
+    # vite-plus-core satisfies vitest's `vite` peer (it IS the Vite 8 fork).
+    vite: '*'
+
+allowBuilds:
+  esbuild: true
