@@ -1,6 +1,6 @@
 {
   "name": "maplibre-gl-wind",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "description": "Wind particle visualization layer for deck.gl and MapLibre GL JS",
   "keywords": [
