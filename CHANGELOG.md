@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.2](https://github.com/geoql/maplibre-gl-wind/compare/v0.2.1...v0.2.2) (2026-10-25)
+
+
+### Features
+
+* **demo:** enable ga4 ([#8](https://github.com/geoql/maplibre-gl-wind/issues/8)) ([d6c0a80](https://github.com/geoql/maplibre-gl-wind/commit/d6c0a803f0303dcbe5c60f2ae18d23d4f21ab4f9))
+
+
+### Miscellaneous
+
+* move the demo to cloudflare workers, pnpm and latest deps ([#6](https://github.com/geoql/maplibre-gl-wind/issues/6)) ([a2a76b5](https://github.com/geoql/maplibre-gl-wind/commit/a2a76b55e6a0680e5ab1b7362d09ea6b1af11b40))
+
 ## [0.2.1](https://github.com/geoql/maplibre-gl-wind/compare/v0.2.0...v0.2.1) (2026-08-15)
 
 
