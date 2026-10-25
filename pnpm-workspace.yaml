@@ -1,14 +1,69 @@
-packages: []
+# pnpm 11+ reads only auth/registry keys from .npmrc; every other setting
+# lives here in camelCase.
+#
+# The library is the root package. The demo (maplibre-gl-wind.geoql.in) is a
+# private Nuxt app in demo/ that consumes the built library via workspace:*.
+packages:
+  - demo
+
+# Demo versions, checked against the npm registry on 2026-10-25.
+catalog:
+  nuxt: ^4.6.2
+  vue: ^3.5.44
+  '@nuxtjs/color-mode': ^4.0.1
+  '@nuxt/scripts': ^1.3.12
+  '@openpanel/nuxt': ^0.4.2
+  '@deck.gl/mapbox': ^9.4.0
+  maplibre-gl: ^6.15.0
+  tailwindcss: ^4.3.3
+  '@tailwindcss/vite': ^4.3.3
+  wrangler: ^4.152.0
+  oxlint: ^1.89.0
+  oxfmt: ^0.74.0
+  vue-tsc: ^3.3.13
+
+catalogs:
+  # Classic TypeScript 6 for the demo only: vue-tsc patches the JS compiler,
+  # which the native TypeScript 7 does not ship. The library stays on 7.x.
+  ts6:
+    typescript: ^6.0.3
 
 overrides:
-  # Keep `vite` (peer/type-only in this workspace) on the same instance as Vite+
-  # so there is never a split Vite copy.
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.9
+  # Nuxt 4.5+ runs on unhead v3. Keep one copy on the release that fixed the
+  # Cloudflare preset build break (nuxt/nuxt#35670).
+  unhead: '>=3.4.3'
 
 peerDependencyRules:
   allowedVersions:
     # vite-plus-core satisfies vitest's `vite` peer (it IS the Vite 8 fork).
     vite: '*'
 
+minimumReleaseAge: 60
+minimumReleaseAgeExclude:
+  - '@nuxt/*'
+  - nuxt
+  - '@vue/*'
+  - vue
+  - wrangler
+  - workerd
+  - miniflare
+  - '@cloudflare/*'
+  - '@oxlint/*'
+  - '@oxfmt/*'
+  - oxlint
+  - oxfmt
+  - '@commitlint/*'
+  - '@types/*'
+  - '@deck.gl/*'
+  - '@luma.gl/*'
+  - maplibre-gl
+  - vite-plus
+  - '@voidzero-dev/*'
+
 allowBuilds:
+  '@parcel/watcher': false
   esbuild: true
+  sharp: false
+  unrs-resolver: true
+  vue-demi: false
+  workerd: true

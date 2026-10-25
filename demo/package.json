@@ -1,0 +1,44 @@
+{
+  "name": "maplibre-gl-wind-demo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Live demo of maplibre-gl-wind at maplibre-gl-wind.geoql.in",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt build && wrangler dev --config .output/server/wrangler.json",
+    "deploy": "nuxt build && wrangler deploy --config .output/server/wrangler.json",
+    "postinstall": "nuxt prepare",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --check .",
+    "format:fix": "oxfmt --write .",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@deck.gl/core": "^9.4.0",
+    "@deck.gl/layers": "^9.4.0",
+    "@deck.gl/mapbox": "catalog:",
+    "@luma.gl/core": "^9.4.2",
+    "@luma.gl/engine": "^9.4.2",
+    "@luma.gl/shadertools": "^9.4.2",
+    "@nuxt/scripts": "catalog:",
+    "@nuxtjs/color-mode": "catalog:",
+    "@openpanel/nuxt": "catalog:",
+    "maplibre-gl": "catalog:",
+    "maplibre-gl-wind": "workspace:*",
+    "nuxt": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:ts6",
+    "vue-tsc": "catalog:",
+    "wrangler": "catalog:"
+  }
+}

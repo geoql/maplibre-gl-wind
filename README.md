@@ -17,6 +17,8 @@ A high-performance wind particle visualization layer for deck.gl. Renders animat
 
 Based on [Az's deck.gl 9.x particle layer implementation](https://az.id.au/dev/wind-particle-layer-in-deckgl-9.x/).
 
+**Live demo: [maplibre-gl-wind.geoql.in](https://maplibre-gl-wind.geoql.in)** — current global wind from Open-Meteo, on a MapLibre map, with every layer prop adjustable.
+
 ## Features
 
 - GPU-accelerated particle animation using transform feedback
@@ -31,11 +33,11 @@ Based on [Az's deck.gl 9.x particle layer implementation](https://az.id.au/dev/w
 # npm
 npm install maplibre-gl-wind @deck.gl/core @deck.gl/layers
 
-# bun
-bun add maplibre-gl-wind @deck.gl/core @deck.gl/layers
+# pnpm
+pnpm add maplibre-gl-wind @deck.gl/core @deck.gl/layers
 
 # JSR
-bunx jsr add @geoql/maplibre-gl-wind
+pnpm dlx jsr add @geoql/maplibre-gl-wind
 ```
 
 ## Usage
@@ -78,13 +80,15 @@ const deck = new Deck({
 ```typescript
 import { WindParticleLayer, generateWindTexture } from 'maplibre-gl-wind';
 
+// `direction` is where the wind blows TOWARD, in degrees clockwise from north.
+// Weather APIs report where it comes FROM: add 180 to those.
 const windData = [
   { lat: 40.7, lon: -74.0, speed: 5.2, direction: 180 },
   { lat: 34.0, lon: -118.2, speed: 3.1, direction: 270 },
   // ... more points
 ];
 
-const { canvas, uMin, uMax, vMin, vMax } = generateWindTexture(windData, {
+const { canvas, imageUnscale } = generateWindTexture(windData, {
   width: 360,
   height: 180,
   bounds: [-180, -90, 180, 90],
@@ -94,7 +98,7 @@ const layer = new WindParticleLayer({
   id: 'wind',
   image: canvas.toDataURL(),
   bounds: [-180, -90, 180, 90],
-  imageUnscale: [Math.min(uMin, vMin), Math.max(uMax, vMax)],
+  imageUnscale,
   numParticles: 8192,
   colorRamp: [
     [0.0, [59, 130, 189, 255]],
@@ -106,13 +110,13 @@ const layer = new WindParticleLayer({
 ### With MapLibre GL JS
 
 ```typescript
-import maplibregl from 'maplibre-gl';
+import { Map } from 'maplibre-gl';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { WindParticleLayer } from 'maplibre-gl-wind';
 
-const map = new maplibregl.Map({
+const map = new Map({
   container: 'map',
-  style: 'https://demotiles.maplibre.org/style.json',
+  style: 'https://tiles.openfreemap.org/styles/liberty',
   center: [0, 20],
   zoom: 2,
 });
@@ -153,7 +157,10 @@ map.on('load', () => {
 
 ### generateWindTexture
 
-Converts wind data points to a texture using IDW interpolation.
+Converts wind data points to a texture using IDW interpolation. U and V are
+both encoded with one shared range, returned as `imageUnscale` — pass it
+straight to `WindParticleLayer`. `rasterizeWindField` does the same work
+without the DOM (workers, server) and returns the raw RGBA pixels.
 
 ```typescript
 function generateWindTexture(
@@ -184,8 +191,8 @@ function createWindDataFromOpenWeatherMap(
 
 Wind textures encode U (east-west) and V (north-south) velocity components:
 
-- **R channel**: U component (normalized 0-255)
-- **G channel**: V component (normalized 0-255)
+- **R channel**: U component, scaled from `imageUnscale` to 0-255
+- **G channel**: V component, scaled from the same `imageUnscale` range
 - **A channel**: Should be 255 for valid data
 
 ## Requirements
@@ -201,11 +208,17 @@ Wind textures encode U (east-west) and V (north-south) velocity components:
 4. Submit a PR
 
 ```bash
-bun install
-bun run build
-bun run lint
-bun run typecheck
+pnpm install
+pnpm run build
+pnpm run lint
+pnpm run typecheck
+pnpm run test
+
+# demo site (demo/, Nuxt on Cloudflare Workers)
+pnpm run demo:dev
 ```
+
+Toolchain: Node 26 (`devEngines`), pnpm (version pinned in `packageManager`).
 
 ## License
 

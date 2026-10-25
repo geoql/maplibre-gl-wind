@@ -1,0 +1,194 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Fonts (self-hosted, same families as nxui.geoql.in) ─────────── */
+
+@font-face {
+  font-family: 'Clash Display';
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/clash-display-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Clash Display';
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/clash-display-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Satoshi';
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/satoshi-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Satoshi';
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/satoshi-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Satoshi';
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/satoshi-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
+}
+
+/* ── Tokens ──────────────────────────────────────────────────────────
+ * Paper and ink with one accent: survey-marker orange, the colour of a
+ * benchmark on a topographic sheet. Accent is for marks, focus and the
+ * range thumbs — never for body text blocks. Same tokens as geoql.in.
+ */
+
+:root {
+  color-scheme: light;
+  --paper: oklch(0.975 0.006 85);
+  --paper-2: oklch(0.955 0.008 85);
+  --ink: oklch(0.21 0.014 260);
+  --ink-2: oklch(0.42 0.014 260);
+  --ink-3: oklch(0.52 0.012 260);
+  --rule: oklch(0.87 0.008 85);
+  --contour: oklch(0.86 0.012 85);
+  --accent: oklch(0.6 0.17 42);
+  --accent-ink: oklch(0.5 0.15 40);
+}
+
+.dark {
+  color-scheme: dark;
+  --paper: oklch(0.17 0.01 260);
+  --paper-2: oklch(0.2 0.012 260);
+  --ink: oklch(0.95 0.008 85);
+  --ink-2: oklch(0.78 0.01 85);
+  --ink-3: oklch(0.66 0.012 260);
+  --rule: oklch(0.29 0.012 260);
+  --contour: oklch(0.27 0.014 260);
+  --accent: oklch(0.72 0.15 48);
+  --accent-ink: oklch(0.78 0.13 52);
+}
+
+@theme {
+  --font-sans: 'Satoshi', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Clash Display', 'Satoshi', ui-sans-serif, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-contour: var(--contour);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+}
+
+@layer base {
+  html {
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: 'calt' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--paper);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ── Range inputs: hairline track, square accent thumb ─────────────── */
+
+.wind-range {
+  appearance: none;
+  height: 1.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+.wind-range::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--rule);
+}
+.wind-range::-moz-range-track {
+  height: 1px;
+  background: var(--rule);
+}
+.wind-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-top: -0.4rem;
+  background: var(--accent);
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.wind-range::-moz-range-thumb {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 0;
+  background: var(--accent);
+  border: 2px solid var(--paper);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* ── MapLibre controls follow the page theme ─────────────────────────
+ * maplibre-gl.css loads after this file (the map component imports it), so
+ * every selector is prefixed with `html` to win on specificity.
+ */
+
+html .maplibregl-ctrl-group {
+  border-radius: 0;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+html .maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--rule);
+}
+html.dark .maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+html .maplibregl-ctrl.maplibregl-ctrl-attrib,
+html .maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact {
+  background-color: var(--paper);
+  color: var(--ink-2);
+  box-shadow: 0 0 0 1px var(--rule);
+}
+html .maplibregl-ctrl-attrib a {
+  color: var(--ink-2);
+}
+html .maplibregl-ctrl-attrib-button {
+  background-color: transparent;
+}
+html.dark .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
