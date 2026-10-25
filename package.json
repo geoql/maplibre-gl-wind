@@ -52,9 +52,9 @@
     "format": "vp fmt --check",
     "format:fix": "vp fmt --write",
     "typecheck": "vp check --no-fmt --no-lint",
-    "demo:dev": "pnpm run build && pnpm --filter maplibre-gl-wind-demo dev",
-    "demo:build": "pnpm run build && pnpm --filter maplibre-gl-wind-demo build",
-    "demo:deploy": "pnpm run build && pnpm --filter maplibre-gl-wind-demo deploy",
+    "demo:dev": "pnpm run build && pnpm --filter maplibre-gl-wind-demo run dev",
+    "demo:build": "pnpm run build && pnpm --filter maplibre-gl-wind-demo run build",
+    "demo:deploy": "pnpm run build && pnpm --filter maplibre-gl-wind-demo run deploy",
     "publish:npm": "npm publish --access public",
     "publish:jsr": "pnpm dlx jsr publish"
   },
