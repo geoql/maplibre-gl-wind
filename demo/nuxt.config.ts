@@ -31,7 +31,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       // GA4 property not created yet: empty skips GA4 entirely.
-      gtagId: '',
+      gtagId: 'G-569FV09FL6',
       plausibleScriptId: 'i5v8tuYnIS2MaHv1oxX0w',
       plausibleApiHost: 'https://analytics.geoql.in',
     },
