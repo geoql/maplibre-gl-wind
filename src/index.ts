@@ -8,10 +8,12 @@ export { windUniforms } from './WindParticleLayer';
 
 export {
   generateWindTexture,
+  rasterizeWindField,
   createWindDataFromOpenWeatherMap,
 } from './generateWindTexture';
 export type {
   WindDataPoint,
+  WindFieldRaster,
   WindTextureResult,
   GenerateWindTextureOptions,
 } from './generateWindTexture';

@@ -1,18 +1,35 @@
 export interface WindDataPoint {
   lat: number;
   lon: number;
+  /** Wind speed, in the unit you want the layer to show (m/s for example). */
   speed: number;
+  /**
+   * Direction the wind blows TOWARD, in degrees clockwise from north.
+   * Weather APIs usually report where the wind comes FROM; add 180 to those.
+   */
   direction: number;
 }
 
-export interface WindTextureResult {
-  canvas: HTMLCanvasElement;
-  imageData: ImageData;
+export interface WindFieldRaster {
+  /** RGBA pixels: R = U, G = V, both scaled into `imageUnscale`. */
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
   uMin: number;
   uMax: number;
   vMin: number;
   vMax: number;
+  /**
+   * The shared velocity range both channels are scaled into. Pass it to
+   * `WindParticleLayer` as `imageUnscale`.
+   */
+  imageUnscale: [number, number];
   bounds: [number, number, number, number];
+}
+
+export interface WindTextureResult extends Omit<WindFieldRaster, 'data'> {
+  canvas: HTMLCanvasElement;
+  imageData: ImageData;
 }
 
 export interface GenerateWindTextureOptions {
@@ -69,10 +86,14 @@ function idwInterpolate(
   };
 }
 
-export function generateWindTexture(
+/**
+ * Interpolate wind points onto a grid (IDW) and encode U/V as RGBA pixels.
+ * Pure: no DOM, so it also runs in workers and on the server.
+ */
+export function rasterizeWindField(
   windData: WindDataPoint[],
   options: GenerateWindTextureOptions = {},
-): WindTextureResult {
+): WindFieldRaster {
   const {
     width = 360,
     height = 180,
@@ -108,38 +129,52 @@ export function generateWindTexture(
     }
   }
 
-  const uRange = uMax - uMin || 1;
-  const vRange = vMax - vMin || 1;
+  // The layer decodes both channels with ONE range (`imageUnscale`), so both
+  // must be encoded with that same range. Scaling U and V separately skews
+  // every direction and speed.
+  const min = Math.min(uMin, vMin);
+  const max = Math.max(uMax, vMax);
+  const range = max - min || 1;
 
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
-  const imageData = ctx.createImageData(width, height);
-
+  const data = new Uint8ClampedArray(width * height * 4);
   for (let i = 0; i < uvGrid.length; i++) {
     const { u, v } = uvGrid[i];
-    const normalizedU = (u - uMin) / uRange;
-    const normalizedV = (v - vMin) / vRange;
-
     const idx = i * 4;
-    imageData.data[idx] = Math.round(normalizedU * 255);
-    imageData.data[idx + 1] = Math.round(normalizedV * 255);
-    imageData.data[idx + 2] = 0;
-    imageData.data[idx + 3] = 255;
+    data[idx] = Math.round(((u - min) / range) * 255);
+    data[idx + 1] = Math.round(((v - min) / range) * 255);
+    data[idx + 2] = 0;
+    data[idx + 3] = 255;
   }
 
-  ctx.putImageData(imageData, 0, 0);
-
   return {
-    canvas,
-    imageData,
+    data,
+    width,
+    height,
     uMin,
     uMax,
     vMin,
     vMax,
+    imageUnscale: [min, max],
     bounds,
   };
+}
+
+/** `rasterizeWindField`, drawn into a canvas (browser only). */
+export function generateWindTexture(
+  windData: WindDataPoint[],
+  options: GenerateWindTextureOptions = {},
+): WindTextureResult {
+  const { data, ...raster } = rasterizeWindField(windData, options);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = raster.width;
+  canvas.height = raster.height;
+  const ctx = canvas.getContext('2d')!;
+  const imageData = ctx.createImageData(raster.width, raster.height);
+  imageData.data.set(data);
+  ctx.putImageData(imageData, 0, 0);
+
+  return { ...raster, canvas, imageData };
 }
 
 export function createWindDataFromOpenWeatherMap(
