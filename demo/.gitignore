@@ -1,0 +1,5 @@
+.nuxt
+.output
+.wrangler
+.data
+node_modules

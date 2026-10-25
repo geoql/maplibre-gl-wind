@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://maplibre-gl-wind.geoql.in/sitemap.xml
