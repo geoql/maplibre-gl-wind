@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite-plus';
 
 export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['tests/**/*.test.ts'],
+  },
   pack: {
     entry: ['src/index.ts'],
     format: ['esm'],
@@ -19,7 +23,7 @@ export default defineConfig({
   },
   lint: {
     plugins: ['typescript', 'import'],
-    ignorePatterns: ['dist', 'node_modules', 'coverage', '*.config.ts'],
+    ignorePatterns: ['dist', 'node_modules', 'coverage', '*.config.ts', 'demo'],
     options: {
       typeAware: true,
       typeCheck: true,
@@ -55,6 +59,7 @@ export default defineConfig({
       '*.lock',
       'CHANGELOG.md',
       'jsr.json',
+      'demo',
     ],
   },
 });
