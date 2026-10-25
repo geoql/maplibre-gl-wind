@@ -128,10 +128,7 @@ function modulo(x: number, y: number): number {
   return ((x % y) + y) % y;
 }
 
-function wrapLongitude(
-  lng: number,
-  minLng: number | undefined = undefined,
-): number {
+function wrapLongitude(lng: number, minLng?: number): number {
   let wrappedLng = modulo(lng + 180, 360) - 180;
   if (typeof minLng === 'number' && wrappedLng < minLng) {
     wrappedLng += 360;
@@ -204,12 +201,12 @@ export default class WindParticleLayer<
   }
 
   getShaders() {
-    const oldShaders = super.getShaders();
     const { speedRange, imageUnscale, bounds } = this.props;
     const [minSpeed, maxSpeed] = speedRange || [0, 30];
 
     return {
-      ...oldShaders,
+      // LineLayer types its shaders as `any` upstream; spread them as-is.
+      ...super.getShaders(),
       inject: {
         'vs:#decl': `
           uniform sampler2D windTexture;
@@ -501,7 +498,11 @@ export default class WindParticleLayer<
       stencilReadOnly: true,
     });
 
-    const encoder = this.context.device.createCommandEncoder();
+    // Shift every particle one age slot back to build the trails. luma.gl
+    // records encoder commands and runs nothing until the command buffer is
+    // submitted; without submit() the trails never grow past one segment.
+    const device = this.context.device;
+    const encoder = device.createCommandEncoder();
     encoder.copyBufferToBuffer({
       sourceBuffer: sourcePositions,
       sourceOffset: 0,
@@ -509,7 +510,7 @@ export default class WindParticleLayer<
       destinationOffset: numParticles * 4 * 3,
       size: numAgedInstances * 4 * 3,
     });
-    encoder.finish();
+    device.submit(encoder.finish());
     encoder.destroy();
 
     this.state.sourcePositions = targetPositions;
