@@ -11,6 +11,8 @@
 [![tsdown](https://img.shields.io/badge/bundler-tsdown-3178c6)](https://tsdown.dev/)
 [![typescript](https://img.shields.io/npm/dependency-version/maplibre-gl-wind/dev/typescript?logo=TypeScript)](https://www.typescriptlang.org/)
 
+**[Live demo](https://maplibre-gl-wind.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind)** · [npm](https://www.npmjs.com/package/maplibre-gl-wind) · [JSR](https://jsr.io/@geoql/maplibre-gl-wind)
+
 ---
 
 A high-performance wind particle visualization layer for deck.gl. Renders animated wind flow particles with speed-based coloring using GPU transform feedback.
@@ -219,6 +221,17 @@ pnpm run demo:dev
 ```
 
 Toolchain: Node 26 (`devEngines`), pnpm (version pinned in `packageManager`).
+
+## More from the author
+
+- [maplibre-gl-interpolate-heatmap](https://maplibre-gl-interpolate-heatmap.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) — IDW interpolated heatmap layer
+- [maplibre-gl-snow](https://maplibre-gl-snow.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) — WebGPU snow particle layer
+- [maplibre-gl-starfield](https://maplibre-gl-starfield.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) — Three.js starfield skybox for globe maps
+- [maplibre-gl-draw-circle](https://maplibre-gl-draw-circle.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) — draw and edit circles on a MapLibre map
+- [v-maplibre](https://v-maplibre.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) — 50+ Vue 3 components for MapLibre GL
+- [mapcn-vue](https://mapcn-vue.geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) — shadcn-vue map components you copy into your app
+
+See every project at [vinayakkulkarni.dev/projects](https://vinayakkulkarni.dev/projects?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind) and [geoql.in](https://geoql.in/?utm_source=github&utm_medium=readme&utm_campaign=maplibre-gl-wind).
 
 ## License
 
