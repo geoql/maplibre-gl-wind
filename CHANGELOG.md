@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/geoql/maplibre-gl-wind/compare/v0.2.2...v0.2.3) (2026-10-28)
+
+
+### Documentation
+
+* link live demo and related projects ([#9](https://github.com/geoql/maplibre-gl-wind/issues/9)) ([56cc3b7](https://github.com/geoql/maplibre-gl-wind/commit/56cc3b780d25e9f209bb8e55a621775c07785912))
+
 ## [0.2.2](https://github.com/geoql/maplibre-gl-wind/compare/v0.2.1...v0.2.2) (2026-10-25)
 
 
